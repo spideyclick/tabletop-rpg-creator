@@ -1,4 +1,4 @@
-import os, random, pickle
+import os, random, pickle, json
 from flask import Flask, render_template
 
 objectTemplates = ['Character', 'Class', 'Location', 'Item', 'Skill']
@@ -102,9 +102,11 @@ def hello():
     myScene.children[1].addAttribute('Name', 'Gretel')
     myScene.children[1].addAttribute('Gender', 'Female')
     myScene.children[1].addAttribute('HP', counter(0, 8, 7))
-    sceneOutput=myScene.printObject()
+    # sceneOutput=myScene.printObject()
+    # sceneOutput=json.loads(myScene, default=lambda o: o.__dict__)
+    sceneOutput=json.dumps(myScene, default=lambda o: o.__dict__)
     print('Scene Output: {0}'.format(sceneOutput))
-    return render_template("engine.html", output=sceneOutput)
+    return render_template("engine.html", data=sceneOutput)
 
 
 if __name__ == '__main__':

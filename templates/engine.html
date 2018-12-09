@@ -23,9 +23,21 @@
         padding:15px;
       }
     </style>
+    <script type="text/javascript">
+      function myFunc() {
+        rawData="{{data}}".replace(/&#34;/g, "\"")
+        // console.log(rawData);
+        data=JSON.parse(rawData);
+        console.log(data);
+        for (var i = 0; i < data.length; i++) {
+          console.log(data[i]);
+        }
+      }
+      window.onload=myFunc
+    </script>
   </head>
   <body>
-    {% for item in output %}
+    {% for item in data %}
       <div class="card">
         {{ item }}
       </div>
