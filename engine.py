@@ -1,4 +1,6 @@
-import random, json, pickle
+import os, random, pickle
+from flask import Flask, render_template
+
 objectTemplates = ['Character', 'Class', 'Location', 'Item', 'Skill']
 idCounter=0
 
@@ -55,26 +57,55 @@ class rpgObject():
     def addChild(self, object):
         self.children.append(object)
     def printObject(self, indent=0):
+        output=""""""
         # for key, value in self.attributes.items():
         #     print(key, value)
-        print('')
-        print(('  ' * indent) + 'id: {0}'.format(self.id))
-        print(('  ' * indent) + 'template: {0}'.format(self.objectTemplate))
-        print(('  ' * indent) + 'color: {0}'.format(self.color))
-        print(('  ' * indent) + 'tags({1}): {0}'.format(self.tags, len(self.tags)))
-        print(('  ' * indent) + 'rules({1}): {0}'.format(self.rules, len(self.rules)))
-        print(('  ' * indent) + 'Attributes({1}):'.format(self.attributes, len(self.attributes)))
+        output+=('  ' * indent) + 'id: {0}\n'.format(self.id)
+        output +=('  ' * indent) + 'template: {0}\n'.format(self.objectTemplate)
+        output +=('  ' * indent) + 'color: {0}\n'.format(self.color)
+        output +=('  ' * indent) + 'tags({1}): {0}\n'.format(self.tags, len(self.tags))
+        output +=('  ' * indent) + 'rules({1}): {0}\n'.format(self.rules, len(self.rules))
+        output +=('  ' * indent) + 'Attributes({1}):\n'.format(self.attributes, len(self.attributes))
         for key, value in self.attributes.items():
             if type(value) == type(rpgObject):
-                print(('  ' * (indent + 1)) + key + ':')
+                output +=('  ' * (indent + 1)) + key + ':\n'
                 value.printObject(indent + 2)
             elif type(value) == type(counter(0, 0, 0)):
-                print(('  ' * (indent + 1)) + key + ': ' + str(value.current))
+                output +=('  ' * (indent + 1)) + key + ': ' + str(value.current) + '\n'
             else:
-                print(('  ' * (indent + 1)) + key + ': ' + str(value))
-        print(('  ' * indent) + 'Children({1}):'.format(self.children, len(self.children)))
+                output +=('  ' * (indent + 1)) + key + ': ' + str(value) + '\n'
+        output +=('  ' * indent) + 'Children({1}):\n'.format(self.children, len(self.children))
         for object in self.children:
                 object.printObject(indent + 1)
+        # print(output)
+        return output
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    myScene = rpgObject('Scene')
+    # myScene.addAttribute('entityType', 'Scene')
+    myScene.addChild(rpgObject('Character'))
+    myScene.children[0].addAttribute('Name', 'Hansel')
+    myScene.children[0].addAttribute('Gender', 'Male')
+    myScene.children[0].addAttribute('HP', counter(0, 10, 8))
+    # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))
+    # myScene.children[0].attributes['Skills'].addChild(rpgObject('Skill'))
+    myScene.children[0].addChild(rpgObject('Skill'))
+    myScene.children[0].children[0].addAttribute('Title', 'Sprint')
+    myScene.children[0].children[0].addAttribute('Description', 'Run twice your movement speed. Consumes your action.')
+    myScene.children[0].addChild(rpgObject('Skill'))
+    myScene.children[0].children[1].addAttribute('Title', 'Ready')
+    myScene.children[0].children[1].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
+    myScene.addChild(rpgObject('Character'))
+    myScene.children[1].addAttribute('Name', 'Gretel')
+    myScene.children[1].addAttribute('Gender', 'Female')
+    myScene.children[1].addAttribute('HP', counter(0, 8, 7))
+    sceneOutput=myScene.printObject()
+    print('Scene Output: {0}'.format(sceneOutput))
+    return render_template("engine.html", output=sceneOutput)
+
 
 if __name__ == '__main__':
     # myDice = dice(1, 20, 4)
