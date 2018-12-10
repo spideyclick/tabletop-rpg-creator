@@ -108,7 +108,7 @@ def hello():
     # sceneOutput=json.loads(myScene, default=lambda o: o.__dict__)
     sceneOutput=json.dumps(myScene, default=lambda o: o.__dict__)
     print('Scene Output: {0}'.format(sceneOutput))
-    return render_template("engine.html", data=sceneOutput)
+    return render_template("engine.html", data=sceneOutput, globalId=idCounter)
 
 
 if __name__ == '__main__':

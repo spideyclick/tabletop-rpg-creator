@@ -13,7 +13,11 @@
         font-family:roboto;
       }
       body {
-        background: #f1f1f1;
+        /* background: #f1f1f1; */
+        background: white;
+      }
+      .material-icons {
+        user-select: none;
       }
       .card {
         background:white;
@@ -58,7 +62,6 @@
         border-radius:50%;
         cursor:pointer;
         float: right;
-        user-select: none;
         padding:2px;
       }
       .titleButton:hover {
@@ -68,6 +71,10 @@
       }
     </style>
     <script type="text/javascript">
+      function generateId() {
+        globalId = (globalId + 1)
+        return globalId
+      }
       function unpackObject(object, parentId) {
         var div = document.createElement('div');
         div.setAttribute('class', 'baseObject');
@@ -78,48 +85,59 @@
         // var description = document.createElement('p');
         // description.innerHTML=object['attributes']['Description'];
         // div.appendChild(description);
-        if (parentId == 'topLevel') {
-          div.style.margin='0, auto';
+
+        // if (parentId == 'topLevel') {
+        //   div.style.backgroundColor='white';
+        //   div.style.boxShadow='none';
+        //   document.body.appendChild(div);
+        // } else {
+        for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
+          if (Object.keys(object['attributes'])[i] == 'Title') {
+            var titleDiv=document.createElement('div');
+            titleDiv.setAttribute('id', object['id']+'Title');
+            titleDiv.setAttribute('class', 'titleDiv');
+            titleDiv.style.backgroundColor='#'+object['color'];
+            var thisTitle=document.createElement('h2');
+            thisTitle.setAttribute('class', 'objectTitle');
+            thisTitle.innerHTML=object['attributes']['Title'];
+            titleDiv.appendChild(thisTitle);
+            var titleCategory=document.createElement('small');
+            titleCategory.setAttribute('class', 'objectCategory');
+            titleCategory.innerHTML=object['objectTemplate'];
+            titleDiv.appendChild(titleCategory);
+            var editButton=document.createElement('i');
+            editButton.setAttribute('class', 'material-icons titleButton');
+            editButton.innerHTML='edit';
+            titleDiv.appendChild(editButton);
+            var addButton=document.createElement('i');
+            addButton.setAttribute('class', 'material-icons titleButton');
+            addButton.innerHTML='add';
+            titleDiv.appendChild(addButton);
+            var removeButton=document.createElement('i');
+            removeButton.setAttribute('class', 'material-icons titleButton');
+            removeButton.innerHTML='remove';
+            titleDiv.appendChild(removeButton);
+            document.getElementById(parentId).appendChild(titleDiv);
+            editButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
+            addButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
+            removeButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
+          } else {
+            var thisAttributeName=document.createElement('div');
+            thisAttributeName.setAttribute('class', 'attributeName');
+            thisAttributeName.innerHTML=Object.keys(object['attributes'])[i]
+            div.appendChild(thisAttributeName);
+            var thisAttributeContent=document.createElement('div');
+            thisAttributeContent.setAttribute('class', 'attributeContent');
+            thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
+            div.appendChild(thisAttributeContent);
+            div.appendChild(document.createElement('br'));
+          }
+        }
+        if (parentId == 'body') {
+          div.style.backgroundColor='white';
+          div.style.boxShadow='none';
           document.body.appendChild(div);
         } else {
-          for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
-            if (Object.keys(object['attributes'])[i] == 'Title') {
-              var titleDiv=document.createElement('div');
-              titleDiv.setAttribute('class', 'titleDiv');
-              titleDiv.style.backgroundColor='#'+object['color'];
-              var thisTitle=document.createElement('h2');
-              thisTitle.setAttribute('class', 'objectTitle');
-              thisTitle.innerHTML=object['attributes']['Title'];
-              titleDiv.appendChild(thisTitle);
-              var titleCategory=document.createElement('small');
-              titleCategory.setAttribute('class', 'objectCategory');
-              titleCategory.innerHTML=object['objectTemplate'];
-              titleDiv.appendChild(titleCategory);
-              var editButton=document.createElement('i');
-              editButton.setAttribute('class', 'material-icons titleButton');
-              editButton.innerHTML='edit';
-              titleDiv.appendChild(editButton);
-              var addButton=document.createElement('i');
-              addButton.setAttribute('class', 'material-icons titleButton');
-              addButton.innerHTML='add';
-              titleDiv.appendChild(addButton);
-              var removeButton=document.createElement('i');
-              removeButton.setAttribute('class', 'material-icons titleButton');
-              removeButton.innerHTML='remove';
-              titleDiv.appendChild(removeButton);
-              document.getElementById(parentId).appendChild(titleDiv);
-            } else {
-              var thisAttributeName=document.createElement('div');
-              thisAttributeName.setAttribute('class', 'attributeName');
-              thisAttributeName.innerHTML=Object.keys(object['attributes'])[i]
-              div.appendChild(thisAttributeName);
-              var thisAttributeContent=document.createElement('div');
-              thisAttributeContent.setAttribute('class', 'attributeContent');
-              thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
-              div.appendChild(thisAttributeContent);
-              div.appendChild(document.createElement('br'));
-            }
-          }
           document.getElementById(parentId).appendChild(div);
         }
         if (object['children'].length > 0) {
@@ -128,13 +146,34 @@
           }
         }
       }
+      function addObject(parentId){
+        thisObject = findObjectNode(data, parentId, "data");
+        thisObjectId=generateId();
+        thisObject['children'].push({"id": thisObjectId, "objectTemplate": "Skill", "color": "6996afff", "tags": [], "attributes": {"Title": "Ready", "Description": "Prepare for a condition with advantage. Consumes your action."}, "children": [], "rules": {}});
+        unpackObject(thisObject['children'][thisObject['children'].length-1], parentId)
+      }
+      function findObjectNode(object, id, path) {
+        if (object.id == id) {
+          return object
+        } else {
+          for (var i = 0; i < object['children'].length; i++) {
+            result = findObjectNode(object['children'][i], id, path+`['children'][${i}]`)
+            if (result !== false) {
+              return result
+            }
+          }
+          return false
+        }
+      }
       function importData() {
         data=JSON.parse("{{data}}".replace(/&#34;/g, "\""));
-        unpackObject(data, 'topLevel');
+        globalId={{globalId}}
+        unpackObject(data, 'body');
       }
       window.onload=importData
     </script>
   </head>
-  <body>
+  <body id='body'>
+    <i class="material-icons" style="position:fixed;right:0;top:0;padding:2px;color:black;background:white;border-radius:0 0 0 5px;cursor:pointer;">save</i>
   </body>
 </html>
