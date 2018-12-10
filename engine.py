@@ -89,6 +89,7 @@ def hello():
     myScene.addAttribute('Title', 'Scene')
     myScene.addChild(rpgObject('Character'))
     myScene.children[0].addAttribute('Title', 'Hansel')
+    myScene.children[0].color="7b0025ff"
     myScene.children[0].addAttribute('Gender', 'Male')
     myScene.children[0].addAttribute('HP', counter(0, 10, 8))
     # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))

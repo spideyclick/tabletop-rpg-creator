@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <title>tRPG Engine</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <style media="screen">
       * {
         margin:0;
@@ -26,7 +28,7 @@
         background:rgba(0, 0, 0, 0.04);
         border-radius:0 0 5px 5px;
         box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.33);
-        max-width:400px;
+        /* max-width:400px; */
         margin:0 0 15px 0;
         padding:15px;
       }
@@ -37,11 +39,32 @@
       .attributeContent {
         text-align: right;
       }
-      .objectTitle {
+      .titleDiv {
         border-radius:5px 5px 0 0;
         box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.33);
         padding:10px;
+      }
+      .objectTitle {
         color:white;
+        display:inline-block;
+        margin-right: 5px;
+      }
+      .objectCategory {
+        color:rgba(255, 255, 255, 0.5);
+        display:inline-block;
+      }
+      .titleButton {
+        color:white;
+        border-radius:50%;
+        cursor:pointer;
+        float: right;
+        user-select: none;
+        padding:2px;
+      }
+      .titleButton:hover {
+        color:#ffffff00;
+        background:white;
+        color:black;
       }
     </style>
     <script type="text/javascript">
@@ -56,15 +79,35 @@
         // description.innerHTML=object['attributes']['Description'];
         // div.appendChild(description);
         if (parentId == 'topLevel') {
+          div.style.margin='0, auto';
           document.body.appendChild(div);
         } else {
           for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
             if (Object.keys(object['attributes'])[i] == 'Title') {
+              var titleDiv=document.createElement('div');
+              titleDiv.setAttribute('class', 'titleDiv');
+              titleDiv.style.backgroundColor='#'+object['color'];
               var thisTitle=document.createElement('h2');
               thisTitle.setAttribute('class', 'objectTitle');
               thisTitle.innerHTML=object['attributes']['Title'];
-              thisTitle.style.backgroundColor='#'+object['color'];
-              document.getElementById(parentId).appendChild(thisTitle);
+              titleDiv.appendChild(thisTitle);
+              var titleCategory=document.createElement('small');
+              titleCategory.setAttribute('class', 'objectCategory');
+              titleCategory.innerHTML=object['objectTemplate'];
+              titleDiv.appendChild(titleCategory);
+              var editButton=document.createElement('i');
+              editButton.setAttribute('class', 'material-icons titleButton');
+              editButton.innerHTML='edit';
+              titleDiv.appendChild(editButton);
+              var addButton=document.createElement('i');
+              addButton.setAttribute('class', 'material-icons titleButton');
+              addButton.innerHTML='add';
+              titleDiv.appendChild(addButton);
+              var removeButton=document.createElement('i');
+              removeButton.setAttribute('class', 'material-icons titleButton');
+              removeButton.innerHTML='remove';
+              titleDiv.appendChild(removeButton);
+              document.getElementById(parentId).appendChild(titleDiv);
             } else {
               var thisAttributeName=document.createElement('div');
               thisAttributeName.setAttribute('class', 'attributeName');
