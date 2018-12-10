@@ -44,7 +44,7 @@ class rpgObject():
     def __init__(self, objectTemplate=None, tags=[]):
         self.id=generateId()
         self.objectTemplate=objectTemplate
-        self.color='ffffffff'
+        self.color='6996afff'
         self.tags=tags
         self.attributes={}
         self.children=[]
@@ -86,8 +86,9 @@ app = Flask(__name__)
 def hello():
     myScene = rpgObject('Scene')
     # myScene.addAttribute('entityType', 'Scene')
+    myScene.addAttribute('Title', 'Scene')
     myScene.addChild(rpgObject('Character'))
-    myScene.children[0].addAttribute('Name', 'Hansel')
+    myScene.children[0].addAttribute('Title', 'Hansel')
     myScene.children[0].addAttribute('Gender', 'Male')
     myScene.children[0].addAttribute('HP', counter(0, 10, 8))
     # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))
@@ -99,7 +100,7 @@ def hello():
     myScene.children[0].children[1].addAttribute('Title', 'Ready')
     myScene.children[0].children[1].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
     myScene.addChild(rpgObject('Character'))
-    myScene.children[1].addAttribute('Name', 'Gretel')
+    myScene.children[1].addAttribute('Title', 'Gretel')
     myScene.children[1].addAttribute('Gender', 'Female')
     myScene.children[1].addAttribute('HP', counter(0, 8, 7))
     # sceneOutput=myScene.printObject()

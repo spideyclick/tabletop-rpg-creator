@@ -22,25 +22,76 @@
         margin:15px;
         padding:15px;
       }
+      .baseObject {
+        background:rgba(0, 0, 0, 0.04);
+        border-radius:0 0 5px 5px;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.33);
+        max-width:400px;
+        margin:0 0 15px 0;
+        padding:15px;
+      }
+      .attributeName {
+        float:left;
+        color:rgba(0, 0, 0, 0.5)
+      }
+      .attributeContent {
+        text-align: right;
+      }
+      .objectTitle {
+        border-radius:5px 5px 0 0;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.33);
+        padding:10px;
+        color:white;
+      }
     </style>
     <script type="text/javascript">
-      function myFunc() {
-        rawData="{{data}}".replace(/&#34;/g, "\"")
-        // console.log(rawData);
-        data=JSON.parse(rawData);
-        console.log(data);
-        for (var i = 0; i < data.length; i++) {
-          console.log(data[i]);
+      function unpackObject(object, parentId) {
+        var div = document.createElement('div');
+        div.setAttribute('class', 'baseObject');
+        div.setAttribute('id', object['id']);
+        // var title = document.createElement('h2');
+        // title.innerHTML=object['attributes']['Title'];
+        // div.appendChild(title);
+        // var description = document.createElement('p');
+        // description.innerHTML=object['attributes']['Description'];
+        // div.appendChild(description);
+        if (parentId == 'topLevel') {
+          document.body.appendChild(div);
+        } else {
+          for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
+            if (Object.keys(object['attributes'])[i] == 'Title') {
+              var thisTitle=document.createElement('h2');
+              thisTitle.setAttribute('class', 'objectTitle');
+              thisTitle.innerHTML=object['attributes']['Title'];
+              thisTitle.style.backgroundColor='#'+object['color'];
+              document.getElementById(parentId).appendChild(thisTitle);
+            } else {
+              var thisAttributeName=document.createElement('div');
+              thisAttributeName.setAttribute('class', 'attributeName');
+              thisAttributeName.innerHTML=Object.keys(object['attributes'])[i]
+              div.appendChild(thisAttributeName);
+              var thisAttributeContent=document.createElement('div');
+              thisAttributeContent.setAttribute('class', 'attributeContent');
+              thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
+              div.appendChild(thisAttributeContent);
+              div.appendChild(document.createElement('br'));
+            }
+          }
+          document.getElementById(parentId).appendChild(div);
+        }
+        if (object['children'].length > 0) {
+          for (var i = 0; i < object['children'].length; i++) {
+            unpackObject(object['children'][i], object['id'])
+          }
         }
       }
-      window.onload=myFunc
+      function importData() {
+        data=JSON.parse("{{data}}".replace(/&#34;/g, "\""));
+        unpackObject(data, 'topLevel');
+      }
+      window.onload=importData
     </script>
   </head>
   <body>
-    {% for item in data %}
-      <div class="card">
-        {{ item }}
-      </div>
-    {% endfor %}
   </body>
 </html>
