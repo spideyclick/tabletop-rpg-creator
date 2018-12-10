@@ -86,6 +86,7 @@ app = Flask(__name__)
 def hello():
     myScene = rpgObject('Scene')
     # myScene.addAttribute('entityType', 'Scene')
+    myScene.color = '00000020'
     myScene.addAttribute('Title', 'Scene')
     myScene.addChild(rpgObject('Character'))
     myScene.children[0].addAttribute('Title', 'Hansel')

@@ -136,10 +136,8 @@
         if (parentId == 'body') {
           div.style.backgroundColor='white';
           div.style.boxShadow='none';
-          document.body.appendChild(div);
-        } else {
-          document.getElementById(parentId).appendChild(div);
         }
+        document.getElementById(parentId).appendChild(div);
         if (object['children'].length > 0) {
           for (var i = 0; i < object['children'].length; i++) {
             unpackObject(object['children'][i], object['id'])
