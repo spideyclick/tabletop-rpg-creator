@@ -69,8 +69,18 @@
         background:white;
         color:black;
       }
+      .addNumber {
+        display:inline-block;
+        padding: 0 0 0 5px;
+        cursor: pointer;
+        user-select:none;
+      }
     </style>
     <script type="text/javascript">
+      function removeElement(elementId) { // Removes an element from the document
+        var element = document.getElementById(elementId);
+        element.parentNode.removeChild(element);
+      }
       function generateId() {
         globalId = (globalId + 1)
         return globalId
@@ -79,6 +89,7 @@
         var div = document.createElement('div');
         div.setAttribute('class', 'baseObject');
         div.setAttribute('id', object['id']);
+        processRules(object)
         // var title = document.createElement('h2');
         // title.innerHTML=object['attributes']['Title'];
         // div.appendChild(title);
@@ -128,7 +139,17 @@
             div.appendChild(thisAttributeName);
             var thisAttributeContent=document.createElement('div');
             thisAttributeContent.setAttribute('class', 'attributeContent');
-            thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
+            // console.log(object['attributes'][Object.keys(object['attributes'])[i]]);
+            if (typeof(object['attributes'][Object.keys(object['attributes'])[i]]) == 'number') {
+              var addDiv=document.createElement('div');
+              addDiv.setAttribute('class', 'addNumber');
+              addDiv.setAttribute('onclick', `addNumber(${object.id}, '${Object.keys(object['attributes'])[i]}', 1)`);
+              addDiv.innerHTML="+";
+              thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
+              thisAttributeContent.appendChild(addDiv);
+            } else {
+              thisAttributeContent.innerHTML=object['attributes'][Object.keys(object['attributes'])[i]]
+            }
             div.appendChild(thisAttributeContent);
             div.appendChild(document.createElement('br'));
           }
@@ -144,13 +165,35 @@
           }
         }
       }
+      function processRules(object) {
+        for (var i = 0; i < object['rules'].length; i++) {
+          ruleString=object['rules'][i];
+          affectedAttribute=ruleString.split("=")[0];
+          operation=ruleString.split("=")[1].split("(")[0];
+          causeAttributes=ruleString.split("=")[1].split("(")[1].split(")")[0].split(" ");
+          if (operation == "SUM") {
+            var total = 0;
+            for (var i = 0; i < causeAttributes.length; i++) {
+              total = (total + parseInt(object['attributes'][causeAttributes[i]]));
+            }
+            object['attributes'][affectedAttribute]=total;
+          }
+        }
+      }
+      function addNumber(objectId, attribute, amount) {
+        thisObject=findObjectNode(data, objectId)
+        thisObject['attributes'][attribute] = parseInt(thisObject['attributes'][attribute]) + parseInt(amount)
+        processRules(thisObject);
+        redrawData();
+      }
       function addObject(parentId){
-        thisObject = findObjectNode(data, parentId, "data");
+        thisObject = findObjectNode(data, parentId);
         thisObjectId=generateId();
         thisObject['children'].push({"id": thisObjectId, "objectTemplate": "Skill", "color": "6996afff", "tags": [], "attributes": {"Title": "Ready", "Description": "Prepare for a condition with advantage. Consumes your action."}, "children": [], "rules": {}});
         unpackObject(thisObject['children'][thisObject['children'].length-1], parentId)
       }
       function findObjectNode(object, id, path) {
+        if (path == undefined) { path = "data" }
         if (object.id == id) {
           return object
         } else {
@@ -165,8 +208,19 @@
       }
       function importData() {
         data=JSON.parse("{{data}}".replace(/&#34;/g, "\""));
-        globalId={{globalId}}
+        globalId={{globalId}};
+        drawData();
+      }
+      function drawData() {
         unpackObject(data, 'body');
+      }
+      function clearDraw() {
+        removeElement(document.getElementsByClassName('titleDiv')[0].id);
+        removeElement(document.getElementsByClassName('baseObject')[0].id);
+      }
+      function redrawData() {
+        clearDraw();
+        drawData();
       }
       window.onload=importData
     </script>

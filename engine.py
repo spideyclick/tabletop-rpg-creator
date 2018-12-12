@@ -43,12 +43,12 @@ class rpgObject():
     """This is the generic object for trpgEngine"""
     def __init__(self, objectTemplate=None, tags=[]):
         self.id=generateId()
-        self.objectTemplate=objectTemplate
+        self.objectTemplate=objectTemplate # This is the primary namespace for loaded Attributes and GUI styling.
         self.color='6996afff'
         self.tags=tags
         self.attributes={}
         self.children=[]
-        self.rules={} # Rules are just children objects, I think.
+        self.rules=[] # Rules are just children objects, I think.
         if objectTemplate:
             # importTemplate(objectTemplate)
             pass
@@ -92,15 +92,22 @@ def hello():
     myScene.children[0].addAttribute('Title', 'Hansel')
     myScene.children[0].color="7b0025ff"
     myScene.children[0].addAttribute('Gender', 'Male')
-    myScene.children[0].addAttribute('HP', counter(0, 10, 8))
+    # myScene.children[0].addAttribute('HP', counter(0, 10, 8))
+    myScene.children[0].addChild(rpgObject('HP'))
+    myScene.children[0].children[0].addAttribute('Title', 'HP')
+    myScene.children[0].children[0].addAttribute('Base', 10)
+    myScene.children[0].children[0].addAttribute('Current', 4)
+    myScene.children[0].children[0].addAttribute('Temporary', 4)
+    myScene.children[0].children[0].addAttribute('Total', 0)
+    myScene.children[0].children[0].rules.append("Total=SUM(Current Temporary)")
     # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))
     # myScene.children[0].attributes['Skills'].addChild(rpgObject('Skill'))
     myScene.children[0].addChild(rpgObject('Skill'))
-    myScene.children[0].children[0].addAttribute('Title', 'Sprint')
-    myScene.children[0].children[0].addAttribute('Description', 'Run twice your movement speed. Consumes your action.')
+    myScene.children[0].children[1].addAttribute('Title', 'Sprint')
+    myScene.children[0].children[1].addAttribute('Description', 'Run twice your movement speed. Consumes your action.')
     myScene.children[0].addChild(rpgObject('Skill'))
-    myScene.children[0].children[1].addAttribute('Title', 'Ready')
-    myScene.children[0].children[1].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
+    myScene.children[0].children[2].addAttribute('Title', 'Ready')
+    myScene.children[0].children[2].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
     myScene.addChild(rpgObject('Character'))
     myScene.children[1].addAttribute('Title', 'Gretel')
     myScene.children[1].addAttribute('Gender', 'Female')
@@ -111,31 +118,35 @@ def hello():
     print('Scene Output: {0}'.format(sceneOutput))
     return render_template("engine.html", data=sceneOutput, globalId=idCounter)
 
-
-if __name__ == '__main__':
-    # myDice = dice(1, 20, 4)
-    # myDice.roll()
-    # print(myDice.history)
-    # print(myDice.current)
-
-    myScene = rpgObject('Scene')
-    # myScene.addAttribute('entityType', 'Scene')
-    myScene.addChild(rpgObject('Character'))
-    myScene.children[0].addAttribute('Name', 'Hansel')
-    myScene.children[0].addAttribute('Gender', 'Male')
-    myScene.children[0].addAttribute('HP', counter(0, 10, 8))
-    # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))
-    # myScene.children[0].attributes['Skills'].addChild(rpgObject('Skill'))
-    myScene.children[0].addChild(rpgObject('Skill'))
-    myScene.children[0].children[0].addAttribute('Title', 'Sprint')
-    myScene.children[0].children[0].addAttribute('Description', 'Run twice your movement speed. Consumes your action.')
-    myScene.children[0].addChild(rpgObject('Skill'))
-    myScene.children[0].children[1].addAttribute('Title', 'Ready')
-    myScene.children[0].children[1].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
-    myScene.addChild(rpgObject('Character'))
-    myScene.children[1].addAttribute('Name', 'Gretel')
-    myScene.children[1].addAttribute('Gender', 'Female')
-    myScene.children[1].addAttribute('HP', counter(0, 8, 7))
-    # pickle.dumps(myScene, -1)
-    myScene.printObject()
-    # myScene.children[1].printObject()
+#
+# if __name__ == '__main__':
+#     # myDice = dice(1, 20, 4)
+#     # myDice.roll()
+#     # print(myDice.history)
+#     # print(myDice.current)
+#
+#     myScene = rpgObject('Scene')
+#     # myScene.addAttribute('entityType', 'Scene')
+#     myScene.addChild(rpgObject('Character'))
+#     myScene.children[0].addAttribute('Name', 'Hansel')
+#     myScene.children[0].addAttribute('Gender', 'Male')
+#     # myScene.children[0].addAttribute('HP', counter(0, 10, 8))
+#     myScene.children[0].addChild(rpgObject('HP'))
+#     myScene.children[0].children[0].addAttribute('Base', 10)
+#     myScene.children[0].children[0].addAttribute('Current', 4)
+#     myScene.children[0].children[0].addAttribute('Mod: Temporary', 4)
+#     # myScene.children[0].addAttribute('Skills', rpgObject('SkillBook'))
+#     # myScene.children[0].attributes['Skills'].addChild(rpgObject('Skill'))
+#     myScene.children[0].addChild(rpgObject('Skill'))
+#     myScene.children[0].children[0].addAttribute('Title', 'Sprint')
+#     myScene.children[0].children[0].addAttribute('Description', 'Run twice your movement speed. Consumes your action.')
+#     myScene.children[0].addChild(rpgObject('Skill'))
+#     myScene.children[0].children[1].addAttribute('Title', 'Ready')
+#     myScene.children[0].children[1].addAttribute('Description', 'Prepare for a condition with advantage. Consumes your action.')
+#     myScene.addChild(rpgObject('Character'))
+#     myScene.children[1].addAttribute('Name', 'Gretel')
+#     myScene.children[1].addAttribute('Gender', 'Female')
+#     myScene.children[1].addAttribute('HP', counter(0, 8, 7))
+#     # pickle.dumps(myScene, -1)
+#     myScene.printObject()
+#     # myScene.children[1].printObject()
