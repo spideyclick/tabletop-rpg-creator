@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tRPG Engine</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -88,8 +89,9 @@
       function unpackObject(object, parentId) {
         var div = document.createElement('div');
         div.setAttribute('class', 'baseObject');
+        if (!('id' in object)) {object['id']=generateId()};
         div.setAttribute('id', object['id']);
-        processRules(object)
+        if ('rules' in object) {processRules(object)}
         // var title = document.createElement('h2');
         // title.innerHTML=object['attributes']['Title'];
         // div.appendChild(title);
@@ -102,19 +104,19 @@
         //   div.style.boxShadow='none';
         //   document.body.appendChild(div);
         // } else {
-        for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
-          if (Object.keys(object['attributes'])[i] == 'Title') {
+        if ('attributes' in object) {
+          if ('title' in object['attributes'] && 'color' in object['attributes']) {
             var titleDiv=document.createElement('div');
             titleDiv.setAttribute('id', object['id']+'Title');
             titleDiv.setAttribute('class', 'titleDiv');
-            titleDiv.style.backgroundColor='#'+object['color'];
+            titleDiv.style.backgroundColor='#'+object['attributes']['color'];
             var thisTitle=document.createElement('h2');
             thisTitle.setAttribute('class', 'objectTitle');
-            thisTitle.innerHTML=object['attributes']['Title'];
+            thisTitle.innerHTML=object['attributes']['title'];
             titleDiv.appendChild(thisTitle);
             var titleCategory=document.createElement('small');
             titleCategory.setAttribute('class', 'objectCategory');
-            titleCategory.innerHTML=object['objectTemplate'];
+            titleCategory.innerHTML=object['attributes']['type'];
             titleDiv.appendChild(titleCategory);
             var editButton=document.createElement('i');
             editButton.setAttribute('class', 'material-icons titleButton');
@@ -132,14 +134,15 @@
             editButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
             addButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
             removeButton.setAttribute('onclick', `addObject('${addButton.parentElement.id}');`.replace('Title', ''));
-          } else {
+          }
+          for (var i = 0; i < Object.keys(object['attributes']).length; i++) {
+            if (['title', 'color'].includes(Object.keys(object['attributes'])[i])) {continue;}
             var thisAttributeName=document.createElement('div');
             thisAttributeName.setAttribute('class', 'attributeName');
             thisAttributeName.innerHTML=Object.keys(object['attributes'])[i]
             div.appendChild(thisAttributeName);
             var thisAttributeContent=document.createElement('div');
             thisAttributeContent.setAttribute('class', 'attributeContent');
-            // console.log(object['attributes'][Object.keys(object['attributes'])[i]]);
             if (typeof(object['attributes'][Object.keys(object['attributes'])[i]]) == 'number') {
               var addDiv=document.createElement('div');
               addDiv.setAttribute('class', 'addNumber');
@@ -159,9 +162,9 @@
           div.style.boxShadow='none';
         }
         document.getElementById(parentId).appendChild(div);
-        if (object['children'].length > 0) {
-          for (var i = 0; i < object['children'].length; i++) {
-            unpackObject(object['children'][i], object['id'])
+        if ('children' in object) {
+          for (var i = 0; i < Object.keys(object['children']).length; i++) {
+            unpackObject(object['children'][Object.keys(object['children'])[i]], object['id']);
           }
         }
       }
@@ -181,38 +184,76 @@
         }
       }
       function addNumber(objectId, attribute, amount) {
-        thisObject=findObjectNode(data, objectId)
-        thisObject['attributes'][attribute] = parseInt(thisObject['attributes'][attribute]) + parseInt(amount)
-        processRules(thisObject);
+        thisObject=findObjectNode(data['scene'], objectId);
+        thisObject['attributes'][attribute] = parseInt(thisObject['attributes'][attribute]) + parseInt(amount);
+        if ('rules' in thisObject) {processRules(thisObject);};
         redrawData();
       }
+      // TODO: Replace addobject with duplicateObject.
       function addObject(parentId){
-        thisObject = findObjectNode(data, parentId);
-        thisObjectId=generateId();
-        thisObject['children'].push({"id": thisObjectId, "objectTemplate": "Skill", "color": "6996afff", "tags": [], "attributes": {"Title": "Ready", "Description": "Prepare for a condition with advantage. Consumes your action."}, "children": [], "rules": {}});
-        unpackObject(thisObject['children'][thisObject['children'].length-1], parentId)
+        parentObject = findObjectNode(data['scene'], parentId);
+        console.log(parentObject)
+        newObjectId=generateId();
+        parentObject['children'][newObjectId.toString()]={"id": newObjectId, "attributes": {"title": "Ready", "Description": "Prepare for a condition with advantage. Consumes your action.", "type":"skill", "color": "6996afff", "effects":{}}, "children": {}};
+        unpackObject(parentObject['children'][newObjectId.toString()], parentId)
       }
-      function findObjectNode(object, id, path) {
-        if (path == undefined) { path = "data" }
-        if (object.id == id) {
-          return object
+      function removeObject(parentId){
+        // Simple. Remove an object.
+      }
+      function duplicateObject(parentId){
+        // Dupe the object but with new ID's
+      }
+      function editObject(parentId){
+        // This is the really tough one. Edit color, attributes, etc. (but not children)
+      }
+      function toggleVisibility(elementId) {
+        if (window.getComputedStyle(document.getElementById(elementId)).display == "none") {
+          document.getElementById(elementId).style.display = "block";
         } else {
-          for (var i = 0; i < object['children'].length; i++) {
-            result = findObjectNode(object['children'][i], id, path+`['children'][${i}]`)
-            if (result !== false) {
-              return result
-            }
-          }
-          return false
+          document.getElementById(elementId).style.display = "none";
         }
       }
+      function findObjectNode(object, id) {
+        if (object['id'] == id) {
+          return object
+        }
+        if (!('children' in object)) {
+          return false
+        }
+        for (var i = 0; i < Object.keys(object['children']).length; i++) {
+          result=findObjectNode(object['children'][Object.keys(object['children'])[i]], id)
+          if (result != false) {
+            return result
+          }
+        }
+        return false
+      }
+
+
+
+      // function findObjectNode(object, id, path) {
+      //   if (path == undefined) { path = "data['scene']" }
+      //   console.log(object, id, path)
+      //   if (object.id == id) {
+      //     return object
+      //   } else {
+      //     if (!('children' in object)) {return false}
+      //     for (var i = 0; i < Object.keys(object['children']).length; i++) {
+      //       result = findObjectNode(object['children'][Object.keys(object['children'])[i]], id, path+`['children'][${i}]`)
+      //       if (result !== false) {
+      //         return result
+      //       }
+      //     }
+      //     return false
+      //   }
+      // }
       function importData() {
-        data=JSON.parse("{{data}}".replace(/&#34;/g, "\""));
+        data=JSON.parse({{data|tojson}});
         globalId={{globalId}};
         drawData();
       }
       function drawData() {
-        unpackObject(data, 'body');
+        unpackObject(data['scene'], 'body');
       }
       function clearDraw() {
         removeElement(document.getElementsByClassName('titleDiv')[0].id);
@@ -226,6 +267,14 @@
     </script>
   </head>
   <body id='body'>
-    <i class="material-icons" style="position:fixed;right:0;top:0;padding:2px;color:black;background:white;border-radius:0 0 0 5px;cursor:pointer;">save</i>
+    <!-- <i class="material-icons" style="position:fixed;right:0;top:0;padding:2px;color:black;background:white;border-radius:0 0 0 5px;cursor:pointer;">save</i> -->
+    <!-- <div class="fullScreenModalContainer" style="background: rgba(0, 0, 0, 0.8);position:fixed;margin:0;padding:0;width:100%;height:100%;">
+      <div class="fullScreenModal" style="background: white;margin:15px;padding:15px;">
+        x
+        <br>
+        Name
+        Attributes
+      </div>
+    </div> -->
   </body>
 </html>

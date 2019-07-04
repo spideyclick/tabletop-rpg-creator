@@ -1,0 +1,161 @@
+{
+  "scene": {
+    "attributes": {
+      "title":"Scene",
+      "color":"00000020"
+    },
+    "children":{
+      "characters": {
+        "attributes":{
+          "title":"Characters",
+          "color":"00002020"
+        },
+        "children":{
+          "vilareb": {
+            "attributes":{
+              "title":"Vilareb",
+              "color":"17A05DFF",
+              "hp": 10,
+              "species": "Human",
+              "gender": "Male",
+              "languages": [
+                "Common",
+                "Elvish"
+              ]
+            },
+            "children":{
+              "effects": {
+                "attributes":{
+                  "title":"Active Effects",
+                  "color":"b080b0ff"
+                },
+                "children":{
+                  "25565":{
+                    "attributes":{
+                      "title":"wither",
+                      "color":"202020ff",
+                      "type":"curse",
+                      "duration":"3 Turns",
+                      "repeats":"1t"
+                    },
+                    "children":{
+                      "effect":{
+                        "attributes":{
+                          "title":"Health Damage",
+                          "color":"b88",
+                          "damageAttribute":"health",
+                          "damageAmount":"1d4"
+                        }
+                      }
+                    }
+                  },
+                  "25575":{
+                    "attributes":{
+                      "title":"frostbite",
+                      "color":"aae",
+                      "type":"status",
+                      "duration":"1 Day",
+                      "repeats":"none"
+                    }
+                  }
+                }
+              },
+              "skills": {},
+              "inventory": {}
+            }
+          },
+          "varsule": {
+            "attributes":{
+              "title":"Varsule",
+              "color":"ff8080ff",
+              "hp": 10,
+              "species": "Human",
+              "gender": "Male",
+              "languages": [
+                "Common",
+                "Elvish"
+              ]
+            },
+            "children":{
+              "effects": {
+                "attributes":{
+                  "title":"Active Effects",
+                  "color":"b080b0ff"
+                },
+                "children":{
+                  "25565":{
+                    "attributes":{
+                      "title":"wither",
+                      "color":"202020ff",
+                      "duration":"3 Turns",
+                      "repeats":"1t",
+                      "effect":{
+                        "damageAttribute":"health",
+                        "damageAmount":"1d4"
+                      }
+                    }
+                  },
+                  "25575":{
+                    "attributes":{
+                      "duration":"1 Day",
+                      "repeats":"none"
+                    }
+                  }
+                }
+              },
+              "skills": {},
+              "inventory":{
+                "attributes":{
+                  "color":"909060ff",
+                  "title":"Equipment"
+                },
+                "children":{
+                  "longsword":{
+                    "attributes":{
+                      "title":"Longsword",
+                      "color":"108080ff",
+                      "type":"weapon",
+                      "class":"finesse",
+                      "value":"15gp"
+                    },
+                    "children":{
+                      "actions":{
+                        "children":{
+                          "1hs":{
+                            "attributes":{
+                              "title":"One-Handed Strike",
+                              "color":"800000ff",
+                              "type":"action",
+                              "randomDamage":[1, 8],
+                              "mod":"str",
+                              "target":"hostile",
+                              "targetMax":1
+                            }
+                          },
+                          "Two-Handed Strike":{
+                            "attributes":{
+                              "randomDamage":[1, 12],
+                              "mod":"str",
+                              "target":"hostile",
+                              "targetMax":0
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "date": {
+        "attributes":{
+          "day": 100,
+          "time": "1300"
+        }
+      }
+    }
+  }
+}

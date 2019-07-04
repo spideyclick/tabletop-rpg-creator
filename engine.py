@@ -1,4 +1,4 @@
-import os, random, pickle, json
+import os, random, pprint, pickle, json
 from flask import Flask, render_template
 
 objectTemplates = ['Character', 'Class', 'Location', 'Item', 'Skill']
@@ -8,9 +8,6 @@ def generateId():
     global idCounter
     idCounter+=1
     return idCounter
-
-def importTemplate(Template):
-    pass
 
 class dice():
     """A simple random object with range, current value and history."""
@@ -84,6 +81,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
+    with open('scene.json', 'r') as f:
+        data=json.load(f)
+    return render_template("engine.html", data=json.dumps(data), globalId=idCounter)
     myScene = rpgObject('Scene')
     # myScene.addAttribute('entityType', 'Scene')
     myScene.color = '00000020'
@@ -115,7 +115,7 @@ def hello():
     # sceneOutput=myScene.printObject()
     # sceneOutput=json.loads(myScene, default=lambda o: o.__dict__)
     sceneOutput=json.dumps(myScene, default=lambda o: o.__dict__)
-    print('Scene Output: {0}'.format(sceneOutput))
+    # print('Scene Output: {0}'.format(sceneOutput))
     return render_template("engine.html", data=sceneOutput, globalId=idCounter)
 
 #
