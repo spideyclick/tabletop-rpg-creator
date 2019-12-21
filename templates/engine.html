@@ -77,6 +77,154 @@
         user-select:none;
       }
     </style>
+    <script type="text/javascript"> // Generic Functions
+function findIdsInClass(className) {
+  idsInClass = document.getElementsByClassName(className);
+  var output = [];
+  for (i = 0; i < idsInClass.length; i++) {
+    output.push(idsInClass[i]['id'])
+  }
+  return output
+};
+function findClass (elementId, className) {
+  classFound = false;
+  elementClasses = document.getElementById(elementId).getAttribute('class').split(' ');
+  for (var i = 0; i < elementClasses.length; i++) {
+    if (elementClasses[i] == className) {
+      classFound = true;
+    }
+  }
+  return classFound;
+}
+function findObjectClass (object, className) {
+  console.log(object);
+  classFound = false;
+  objectClasses = object.getAttribute('class').split(' ');
+  for (var i = 0; i < objectClasses.length; i++) {
+    if (objectClasses[i] == className) {
+      classFound = true;
+    }
+  }
+  return classFound;
+}
+function addClass(elementId, className) {
+  classFound = findClass(elementId, className);
+  if (!classFound) {
+    document.getElementById(elementId).setAttribute("class", (document.getElementById(elementId).getAttribute('class') + " " + className))
+  }
+};
+function addObjectClass(object, className) {
+  classFound = findObjectClass(object, className);
+  if (!classFound) {
+    object.setAttribute("class", (object.getAttribute('class') + " " + className))
+  }
+};
+function removeClass(elementId, className) {
+  elementClasses = document.getElementById(elementId).getAttribute('class').split(' ');
+  newClasses = "";
+  for (var i = 0; i < elementClasses.length; i++) {
+    if (elementClasses[i] != className) {
+      newClasses = newClasses + " " + elementClasses[i];
+    }
+  }
+  document.getElementById(elementId).setAttribute('class', newClasses);
+}
+function removeObjectClass(object, className) {
+  objectClasses = object.getAttribute('class').split(' ');
+  newClasses = "";
+  for (var i = 0; i < objectClasses.length; i++) {
+    if (objectClasses[i] != className) {
+      newClasses = newClasses + " " + objectClasses[i];
+    }
+  }
+  object.setAttribute("class", newClasses)
+};
+function toggleClass(elementId, className) {
+  classFound = findClass(elementId, className);
+  if (classFound) {
+    removeClass(elementId, className);
+  } else {
+    document.getElementById(elementId).setAttribute("class", (document.getElementById(elementId).getAttribute('class') + " " + className))
+  }
+}
+function toggleObjectClass(object, className) {
+  classFound = findObjectClass(object, className);
+  if (classFound) {
+    removeObjectClass(object, className);
+  } else {
+    object.setAttribute("class", (object.getAttribute('class') + " " + className))
+  }
+}
+function ajax(outputDiv, url, method='GET', data) {
+  console.log('AJAX request started...')
+  var request = new XMLHttpRequest;
+  request.open(method, url);
+  request.onload = function(){
+    console.log('AJAX request response recieved.');
+    document.getElementById(outputDiv).innerHTML=this.response;
+  };
+  request.send(data);
+};
+function ajaxNext(outputDiv, url, method='GET', data, nextCommand) {
+  console.log('AJAX request started...')
+  var request = new XMLHttpRequest;
+  request.open(method, url);
+  request.onload = function(){
+    console.log('AJAX request response recieved.');
+    document.getElementById(outputDiv).innerHTML=this.response;
+    eval(nextCommand);
+  };
+  request.send(data);
+};
+function copyToClipboard(text) {
+  const tempElement = document.createElement('textarea');
+  tempElement.value = text;
+  document.body.appendChild(tempElement);
+  tempElement.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempElement);
+};
+function isoDate() {
+  var today = new Date();
+  return today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+}
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+    vars[key] = value;
+  });
+  return vars;
+}
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+function htmlUnescape(str) {
+  // return str.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return str.replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, "\"");
+}
+function cookieCheck(key) {
+  // Iterate through the cookie file
+  for (i = 0; i < document.cookie.split(';').length; i++) {
+    if (document.cookie.split('; ')[i].split('=')[0] == key) {
+      return document.cookie.split('; ')[i].split('=')[1]
+    }
+  }
+}
+function cookieRemove(key) {
+  document.cookie = key + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+function cookieSet(key, value) {
+  document.cookie = key + "=" + value + ';' ;
+}
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+    </script>
     <script type="text/javascript">
       function removeElement(elementId) { // Removes an element from the document
         var element = document.getElementById(elementId);
@@ -248,11 +396,15 @@
       //   }
       // }
       function importData() {
-        data=JSON.parse({{data|tojson}});
-        globalId={{globalId}};
-        drawData();
+        // data=JSON.parse({{data|tojson}});
+        // globalId={{globalId}};
+        ajaxNext('jsonDiv', 'http://localhost:8080/scene.json', 'GET', undefined, 'drawData();')
+        // ajax('jsonDiv', 'http://localhost:8080/scene.json', 'GET', undefined)
+        globalId = 200;
       }
       function drawData() {
+        console.log('Drawing Data...')
+        data = JSON.parse(document.getElementById('jsonDiv').innerHTML)
         unpackObject(data['scene'], 'body');
       }
       function clearDraw() {
@@ -263,10 +415,13 @@
         clearDraw();
         drawData();
       }
-      window.onload=importData
+      window.onload=function(){
+        console.log('Window loaded.')
+        importData();
+      }
     </script>
   </head>
-  <body id='body'>
+  <body id="body">
     <!-- <i class="material-icons" style="position:fixed;right:0;top:0;padding:2px;color:black;background:white;border-radius:0 0 0 5px;cursor:pointer;">save</i> -->
     <!-- <div class="fullScreenModalContainer" style="background: rgba(0, 0, 0, 0.8);position:fixed;margin:0;padding:0;width:100%;height:100%;">
       <div class="fullScreenModal" style="background: white;margin:15px;padding:15px;">
@@ -288,5 +443,6 @@
     <p> - Remove Item Modal</p>
     <p> - Edit Mode vs View mode</p>
     <p> - Build example class definition</p>
+    <div id="jsonDiv" style="display:initial;opacity:0.5;"></div>
   </body>
 </html>
